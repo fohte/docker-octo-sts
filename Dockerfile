@@ -5,17 +5,17 @@ ARG OCTO_STS_VERSION=v0.7.1
 
 FROM golang:1.26.3-bookworm AS build
 
-# グローバル ARG はビルドステージ内で再宣言しないと参照できない。
+# A global ARG must be re-declared inside a build stage to be referenced there.
 ARG OCTO_STS_VERSION
 
-# distroless 上で動かすため CGO を無効にして静的バイナリを作る。
+# Build a static binary with CGO disabled so it runs on the distroless base.
 ENV CGO_ENABLED=0
 
 RUN go install "github.com/octo-sts/app/cmd/app@${OCTO_STS_VERSION}"
 
 FROM gcr.io/distroless/static-debian12:nonroot
 
-# GitHub にこのイメージとリポジトリを紐付けさせ、Packages ページからリポジトリへ辿れるようにする。
+# Link this image to its repository so the Packages page points back here.
 LABEL org.opencontainers.image.source="https://github.com/fohte/docker-octo-sts"
 
 COPY --from=build /go/bin/app /usr/bin/octo-sts

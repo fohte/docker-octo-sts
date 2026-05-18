@@ -1,29 +1,22 @@
 # docker-octo-sts
 
-[octo-sts](https://github.com/octo-sts/app) (GitHub App 用の Security Token Service) の
-`cmd/app` をビルドしたコンテナイメージ。home-k8s クラスタ上の Deployment が pull する。
+A container image of [octo-sts](https://github.com/octo-sts/app)'s `cmd/app`, the Security Token Service for GitHub Apps.
 
-octo-sts は公式のコンテナイメージを一切配布しておらず、リポジトリに Dockerfile も無いため、
-ソースから自前でビルドして `ghcr.io/fohte/octo-sts` にホストする。
+octo-sts ships no official container image and has no Dockerfile in its repository, so the image is built from source and hosted at `ghcr.io/fohte/octo-sts`.
 
-## バージョン管理
+## Versioning
 
-ビルド対象の octo-sts のバージョンは [`Dockerfile`](./Dockerfile) の `OCTO_STS_VERSION`
-ARG で固定する。Renovate が `go` datasource でこの値を追跡し、更新 PR を出す。
+The octo-sts version to build is pinned by the `OCTO_STS_VERSION` ARG in the [`Dockerfile`](./Dockerfile). Renovate tracks it via the `go` datasource and opens update PRs.
 
-## ビルドと publish
+## Build and publish
 
-[`.github/workflows/build.yml`](./.github/workflows/build.yml) がイメージをビルドする。
+[`.github/workflows/build.yml`](./.github/workflows/build.yml) builds the image.
 
-- PR: ビルドの成否のみ検証する (push しない)
-- main push: `ghcr.io/fohte/octo-sts:<OCTO_STS_VERSION>` を publish する
+- PR: verifies only that the build succeeds (no push)
+- push to main: publishes `ghcr.io/fohte/octo-sts:<OCTO_STS_VERSION>`
 
-イメージは octo-sts のバージョンタグのみで publish し、`:latest` は付けない。pull する側は
-必ず固定バージョンを参照する。
+The image is published only with the octo-sts version tag; no `:latest` tag is added. Consumers must reference a fixed version.
 
-## ghcr パッケージの公開設定
+## ghcr package visibility
 
-home-k8s クラスタは imagePullSecret 無しでこのイメージを pull するため、`octo-sts`
-パッケージを public にする必要がある。GitHub Packages はパッケージ作成後の可視性変更を
-API で提供していないため、初回 publish 後に GitHub UI で 1 度だけ public に設定する
-(Package settings -> Change visibility)。
+A newly published GitHub Packages package is private by default, regardless of the repository visibility. To allow unauthenticated pulls, change the `octo-sts` package to public once after the first publish via the GitHub UI (Package settings -> Change visibility). GitHub provides no API for this.

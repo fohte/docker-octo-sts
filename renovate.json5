@@ -1,4 +1,8 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['github>fohte/renovate-config:base.json5'],
+  extends: [
+    'github>fohte/renovate-config:base.json5',
+    // Track the `OCTO_STS_VERSION` ARG in the Dockerfile via its `# renovate:` comment.
+    'customManagers:dockerfileVersions',
+  ],
 }

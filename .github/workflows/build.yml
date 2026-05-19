@@ -18,6 +18,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # Required for cosign keyless signing via GitHub OIDC.
+      id-token: write
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -36,6 +38,10 @@ jobs:
 
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
+      - name: Install cosign
+        if: github.event_name == 'push'
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
       # Authentication is unnecessary for PR builds that do not push; log in only on push to main.
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push'
@@ -46,6 +52,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
@@ -53,6 +60,21 @@ jobs:
           # Verify only that the build succeeds on PRs; publish only on push to main.
           push: ${{ github.event_name == 'push' }}
           tags: ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
-          provenance: false
+          # The version tag is reused across rebuilds, so record the source commit
+          # to trace which commit a given digest was built from.
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          # SLSA build provenance and SBOM attestations require pushing an OCI index,
+          # so generate them only on push to main.
+          provenance: ${{ github.event_name == 'push' && 'mode=max' || 'false' }}
+          sbom: ${{ github.event_name == 'push' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Keyless signature bound to this workflow's OIDC identity; no key management.
+      # --recursive also signs the child manifests (image, provenance, SBOM) the
+      # OCI index references, not just the index manifest itself.
+      - name: Sign image
+        if: github.event_name == 'push'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: cosign sign --yes --recursive "${IMAGE}@${DIGEST}"

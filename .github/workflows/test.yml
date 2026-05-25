@@ -2,8 +2,8 @@ name: Test
 
 on:
   push:
-    # octo-sts federation only succeeds for branch pushes: the auto-format trust
-    # policy matches a refs/heads/ subject. Tag pushes cannot auto-format anyway.
+    # octo-sts federation only succeeds for branch pushes: the trust policy's
+    # subject_pattern matches refs/heads/ only. Tag pushes cannot auto-format anyway.
     branches:
       - '**'
 
@@ -19,8 +19,8 @@ jobs:
       - uses: octo-sts/action@f603d3be9d8dd9871a265776e625a27b00effe05 # v1.1.1
         id: octo-sts
         with:
-          scope: fohte/docker-octo-sts
-          identity: auto-format
+          scope: fohte
+          identity: docker-octo-sts
           domain: octo-sts.fohte.net
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

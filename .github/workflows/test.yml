@@ -2,8 +2,8 @@ name: Test
 
 on:
   push:
-    # octo-sts federation only succeeds for branch pushes: the auto-format trust
-    # policy matches a refs/heads/ subject. Tag pushes cannot auto-format anyway.
+    # octo-sts federation only succeeds for branch pushes: the trust policy's
+    # subject_pattern matches refs/heads/ only. Tag pushes cannot auto-format anyway.
     branches:
       - '**'
 

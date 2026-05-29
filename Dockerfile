@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=go depName=github.com/octo-sts/app
-ARG OCTO_STS_VERSION=v0.7.1
+ARG OCTO_STS_VERSION=v0.7.2
 
 FROM golang:1.26.3-bookworm AS build
 

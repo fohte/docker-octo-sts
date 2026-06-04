@@ -5,4 +5,13 @@
     // Track the `OCTO_STS_VERSION` ARG in the Dockerfile via its `# renovate:` comment.
     'customManagers:dockerfileVersions',
   ],
+  packageRules: [
+    {
+      // octo-sts is the sole runtime dependency of this repo; bump it ahead of
+      // anything else so it never gets stuck behind `prConcurrentLimit`.
+      matchDatasources: ['go'],
+      matchPackageNames: ['github.com/octo-sts/app'],
+      prPriority: 100,
+    },
+  ],
 }

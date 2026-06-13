@@ -1,9 +1,10 @@
 # Changes here will be overwritten by Copier
-_commit: v0.8.2
+_commit: v0.8.3
 _src_path: https://github.com/fohte/generic-boilerplate
 description: Container image build for octo-sts
 is_public: true
 project_name: docker-octo-sts
 repo_language: en
+subpackages: []
 type: base
 use_release_please: false

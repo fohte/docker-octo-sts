@@ -4,7 +4,7 @@ _src_path: https://github.com/fohte/generic-boilerplate
 description: Container image build for octo-sts
 is_public: true
 project_name: docker-octo-sts
-repo_id: ''
+repo_id: '1241662932'
 repo_language: en
 subpackages: []
 type: base

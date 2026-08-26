@@ -1,0 +1,6 @@
+issuer: https://token.actions.githubusercontent.com
+subject_pattern: ^repo:fohte@11088009/docker-octo-sts@1241662932:ref:refs/heads/.+$
+claim_pattern:
+  job_workflow_ref: ^fohte/docker-octo-sts/\.github/workflows/test\.yml@[^@]+$
+permissions:
+  contents: write
